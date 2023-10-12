@@ -1,5 +1,12 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { removeAddedClasses } from '../../helpers/removeAddedClasses';
+import { addClassesForSomeElementsOfList } from 'src/app/helpers/addClassesForSomeElementsOfList';
 
 @Component({
   selector: 'app-testPassword',
@@ -7,10 +14,12 @@ import { removeAddedClasses } from '../../helpers/removeAddedClasses';
   styleUrls: ['./testPassword.component.css'],
 })
 export class TestPasswordComponent {
+  @ViewChild('passwordInput') passwordInput!: ElementRef;
+  @ViewChildren('passwordSection') ItemsList!: QueryList<ElementRef>;
   passwordString = '';
 
   onPasswordChange(event: any) {
-    const sectionItems = document.querySelectorAll('.password-section');
+    const sectionItems = this.ItemsList.toArray().map((el) => el.nativeElement);
     this.passwordString = event.target.value;
 
     if (
@@ -27,7 +36,7 @@ export class TestPasswordComponent {
     removeAddedClasses(sectionItems);
 
     if (this.passwordString.length < 8 && this.passwordString.length !== 0) {
-      sectionItems.forEach((el) => el.classList.add('password-is-easy'));
+      addClassesForSomeElementsOfList(sectionItems, 'password-is-easy', 3);
       return;
     }
 
@@ -36,7 +45,7 @@ export class TestPasswordComponent {
       /^[a-zA-Z]+$/.test(this.passwordString) ||
       /^[^a-zA-Z0-9]+$/.test(this.passwordString)
     ) {
-      sectionItems[0].classList.add('password-is-easy');
+      addClassesForSomeElementsOfList(sectionItems, 'password-is-easy', 1);
       return;
     }
 
@@ -45,31 +54,20 @@ export class TestPasswordComponent {
       /^[a-zA-Z\d\s]+$/.test(this.passwordString) ||
       /^[^a-zA-Z]+$/.test(this.passwordString)
     ) {
-      sectionItems[0].classList.add('password-is-medium');
-      sectionItems[1].classList.add('password-is-medium');
+      addClassesForSomeElementsOfList(sectionItems, 'password-is-medium', 2);
       return;
     }
 
     if (this.passwordString) {
-      sectionItems[0].classList.add('password-is-strong');
-      sectionItems[1].classList.add('password-is-strong');
-      sectionItems[2].classList.add('password-is-strong');
+      addClassesForSomeElementsOfList(sectionItems, 'password-is-strong', 3);
     }
   }
 
   onShowPasswordButtonMouseDown() {
-    const passwordInput = document.querySelector(
-      '.input-password'
-    ) as HTMLInputElement;
-
-    passwordInput.type = 'text';
+    this.passwordInput.nativeElement.type = 'text';
   }
 
   onShowPasswordButtonMouseUp() {
-    const passwordInput = document.querySelector(
-      '.input-password'
-    ) as HTMLInputElement;
-
-    passwordInput.type = 'password';
+    this.passwordInput.nativeElement.type = 'password';
   }
 }
