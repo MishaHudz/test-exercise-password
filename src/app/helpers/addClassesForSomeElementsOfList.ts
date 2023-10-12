@@ -1,5 +1,5 @@
 export function addClassesForSomeElementsOfList(
-  elementsArr: Array<any>,
+  elementsArr: Array<Element>,
   className: string,
   numberOfElements: number
 ) {

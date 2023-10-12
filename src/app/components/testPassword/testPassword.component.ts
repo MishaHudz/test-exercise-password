@@ -7,6 +7,11 @@ import {
 } from '@angular/core';
 import { removeAddedClasses } from '../../helpers/removeAddedClasses';
 import { addClassesForSomeElementsOfList } from 'src/app/helpers/addClassesForSomeElementsOfList';
+import {
+  checkingCyrillicIncluded,
+  passwordIsEasy,
+  passwordIsMedium,
+} from 'src/app/helpers/passwordTesters';
 
 @Component({
   selector: 'app-testPassword',
@@ -18,19 +23,17 @@ export class TestPasswordComponent {
   @ViewChildren('passwordSection') ItemsList!: QueryList<ElementRef>;
   passwordString = '';
 
-  onPasswordChange(event: any) {
+  onPasswordChange(event: Event) {
     const sectionItems = this.ItemsList.toArray().map((el) => el.nativeElement);
-    this.passwordString = event.target.value;
+    this.passwordString = (event.target as HTMLInputElement).value;
 
-    if (
-      !/^[a-zA-Z0-9!@#$%^&*()_+{}|:;<>,.?~\-=/\[\]]*$/.test(this.passwordString)
-    ) {
+    if (checkingCyrillicIncluded(this.passwordString)) {
       this.passwordString = this.passwordString.slice(
         0,
         this.passwordString.length - 1
       );
 
-      event.target.value = this.passwordString;
+      (event.target as HTMLInputElement).value = this.passwordString;
     }
 
     removeAddedClasses(sectionItems);
@@ -40,20 +43,12 @@ export class TestPasswordComponent {
       return;
     }
 
-    if (
-      /^\d+$/.test(this.passwordString) ||
-      /^[a-zA-Z]+$/.test(this.passwordString) ||
-      /^[^a-zA-Z0-9]+$/.test(this.passwordString)
-    ) {
+    if (passwordIsEasy(this.passwordString)) {
       addClassesForSomeElementsOfList(sectionItems, 'password-is-easy', 1);
       return;
     }
 
-    if (
-      /^[^\d]+$/.test(this.passwordString) ||
-      /^[a-zA-Z\d\s]+$/.test(this.passwordString) ||
-      /^[^a-zA-Z]+$/.test(this.passwordString)
-    ) {
+    if (passwordIsMedium(this.passwordString)) {
       addClassesForSomeElementsOfList(sectionItems, 'password-is-medium', 2);
       return;
     }
